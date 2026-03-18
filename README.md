@@ -31,8 +31,8 @@ This project is set up to deploy the `webApp/` build output to GitHub Pages via 
 After the first successful workflow run, your site will be available at:
 `https://<your-username>.github.io/<repo-name>/`
 
-If your repo name is `YouTubeZen`, that will be:
-`https://<your-username>.github.io/YouTubeZen/`
+If your repo name is `youtubezen`, that will be:
+`https://<your-username>.github.io/youtubezen/`
 
 ## Firefox extension (local dev)
 
