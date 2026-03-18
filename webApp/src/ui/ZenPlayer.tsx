@@ -19,8 +19,10 @@ const RESUME_COOLDOWN_MS = 600
 export function ZenPlayer({ videoId, startSeconds = 0, onProgressSeconds }: Props) {
   const containerId = useMemo(() => `yt-${videoId}-${Math.random().toString(16).slice(2)}`, [videoId])
   const playerRef = useRef<any>(null)
+  const playerFrameRef = useRef<HTMLDivElement>(null)
   const resumeAtRef = useRef<number>(0)
   const [ended, setEnded] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
   const [ready, setReady] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isPausedCover, setIsPausedCover] = useState(false)
@@ -132,11 +134,39 @@ export function ZenPlayer({ videoId, startSeconds = 0, onProgressSeconds }: Prop
     }
   }, [containerId, videoId])
 
+  const wasPlayingBeforeFullscreenRef = useRef(false)
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      const el = document.fullscreenElement ?? (document as any).webkitFullscreenElement
+      const entering = Boolean(el)
+      setIsFullscreen(entering)
+      if (entering && wasPlayingBeforeFullscreenRef.current) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            try {
+              playerRef.current?.playVideo?.()
+            } catch {
+              // ignore
+            }
+          })
+        })
+      }
+    }
+    document.addEventListener('fullscreenchange', onFullscreenChange)
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', onFullscreenChange)
+      document.removeEventListener('webkitfullscreenchange', onFullscreenChange)
+    }
+  }, [])
+
   useEffect(() => {
     if (!ready) return
 
     const onVisibility = () => {
-      if (document.hidden) {
+      const inFs = Boolean(document.fullscreenElement ?? (document as any).webkitFullscreenElement)
+      if (document.hidden && !inFs) {
         try {
           playerRef.current?.pauseVideo?.()
         } catch {
@@ -183,23 +213,61 @@ export function ZenPlayer({ videoId, startSeconds = 0, onProgressSeconds }: Prop
     }
   }
 
+  const handleFullscreen = async () => {
+    const el = playerFrameRef.current
+    if (!el) return
+    const isFs = document.fullscreenElement ?? (document as any).webkitFullscreenElement
+    try {
+      if (isFs) {
+        await (document.exitFullscreen?.() ?? (document as any).webkitExitFullscreen?.())
+      } else {
+        wasPlayingBeforeFullscreenRef.current = isPlaying
+        await (el.requestFullscreen?.() ?? (el as any).webkitRequestFullscreen?.())
+      }
+    } catch {
+      // ignore (e.g. user denied or not supported)
+    }
+  }
+
   return (
     <section className="playerShell">
-      <div className={`playerFrame ${isPausedCover ? 'playerFrame--overlayActive' : ''}`}>
+      <div
+        ref={playerFrameRef}
+        className={`playerFrame ${isPausedCover && !isFullscreen ? 'playerFrame--overlayActive' : ''}`}
+      >
         <div className="player" id={containerId} />
 
         <div className={`fadeOverlay ${ended ? 'fadeOverlay--on' : ''}`} aria-hidden="true" />
 
-        {ready && isPausedCover && !ended && (
+        {ready && (
+          <button
+            type="button"
+            className="fullscreenBtn"
+            onClick={handleFullscreen}
+            aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+            title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          >
+            {isFullscreen ? (
+              <span className="fullscreenIcon" aria-hidden="true">✕</span>
+            ) : (
+              <span className="fullscreenIcon" aria-hidden="true">⤢</span>
+            )}
+          </button>
+        )}
+        {ready && isPausedCover && !ended && !isFullscreen && (
           <button
             type="button"
             className="pauseCover"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleResume(e)
+            }}
             onPointerDown={(e) => {
               e.preventDefault()
               e.stopPropagation()
               handleResume(e)
             }}
-            onClick={(e) => e.preventDefault()}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()

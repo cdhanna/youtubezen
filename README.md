@@ -1,5 +1,7 @@
 # YouTube Zen
 
+> [!WARNING] **⚠️ Warning — vibe coded slop.** This project is rough around the edges. The goal is to help watch YouTube with little minds (or anyone easily distracted) by stripping away the algorithm’s hooks—recommendations, autoplay, shorts, and the rest—so you can actually watch what you came for.
+
 This repo contains:
 - `webApp/`: the distraction-free YouTube player website (Vite + React)
 - `extension/`: a Firefox extension that adds a “Open in YouTube Zen” button on YouTube watch pages
