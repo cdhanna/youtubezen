@@ -10,13 +10,33 @@ const runtime = typeof browser !== 'undefined' ? browser.runtime : chrome.runtim
 const DEFAULT_ZEN_URL = 'http://127.0.0.1:5173/'
 const STORAGE_KEY = 'ytzen_site_url'
 
+const YT_ID_RE = /^[a-zA-Z0-9_-]{6,20}$/
+
 function getVideoId() {
-  const u = new URL(window.location.href)
-  const v = u.searchParams.get('v')
-  if (!v) return null
-  // minimal validation (11 chars is typical)
-  if (!/^[a-zA-Z0-9_-]{6,20}$/.test(v)) return null
-  return v
+  try {
+    const u = new URL(window.location.href)
+    const host = u.hostname.replace(/^www\./, '').toLowerCase()
+
+    if (host === 'youtu.be') {
+      const id = u.pathname.split('/').filter(Boolean)[0] ?? ''
+      return YT_ID_RE.test(id) ? id : null
+    }
+
+    if (host.includes('youtube.com')) {
+      if (u.pathname === '/watch') {
+        const v = u.searchParams.get('v') ?? ''
+        return YT_ID_RE.test(v) ? v : null
+      }
+      const parts = u.pathname.split('/').filter(Boolean)
+      const maybeId = parts[1] ?? ''
+      if (parts[0] === 'embed' || parts[0] === 'shorts' || parts[0] === 'v') {
+        return YT_ID_RE.test(maybeId) ? maybeId : null
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return null
 }
 
 async function getZenUrl() {
@@ -58,12 +78,16 @@ function ensureButton() {
 
   // YouTube is a SPA; watch URL changes.
   let lastHref = window.location.href
-  window.setInterval(() => {
+  const checkUrl = () => {
     if (window.location.href !== lastHref) {
       lastHref = window.location.href
       updateEnabled()
     }
-  }, 500)
+  }
+  window.setInterval(checkUrl, 300)
+  window.addEventListener('popstate', updateEnabled)
+  // Re-check after a short delay (SPA may update URL after load)
+  setTimeout(updateEnabled, 500)
 }
 
 ensureButton()
