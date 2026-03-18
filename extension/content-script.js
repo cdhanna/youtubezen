@@ -7,7 +7,7 @@ const storage =
 
 const runtime = typeof browser !== 'undefined' ? browser.runtime : chrome.runtime
 
-const DEFAULT_ZEN_URL = 'http://127.0.0.1:5173/'
+const DEFAULT_ZEN_URL = 'https://cdhanna.github.io/youtubezen/'
 const STORAGE_KEY = 'ytzen_site_url'
 
 const YT_ID_RE = /^[a-zA-Z0-9_-]{6,20}$/

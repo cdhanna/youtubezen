@@ -6,7 +6,7 @@ const storage =
     : chrome.storage.local
 
 const STORAGE_KEY = 'ytzen_site_url'
-const DEFAULT_ZEN_URL = 'http://127.0.0.1:5173/'
+const DEFAULT_ZEN_URL = 'https://cdhanna.github.io/youtubezen/'
 
 function normalize(url) {
   const u = (url || '').trim()
