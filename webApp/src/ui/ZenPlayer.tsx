@@ -14,9 +14,12 @@ type Props = {
   onProgressSeconds?: (seconds: number) => void
 }
 
+const RESUME_COOLDOWN_MS = 600
+
 export function ZenPlayer({ videoId, startSeconds = 0, onProgressSeconds }: Props) {
   const containerId = useMemo(() => `yt-${videoId}-${Math.random().toString(16).slice(2)}`, [videoId])
   const playerRef = useRef<any>(null)
+  const resumeAtRef = useRef<number>(0)
   const [ended, setEnded] = useState(false)
   const [ready, setReady] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -100,6 +103,8 @@ export function ZenPlayer({ videoId, startSeconds = 0, onProgressSeconds }: Prop
                 setIsPlaying(true)
                 setIsPausedCover(false)
               } else if (e?.data === YT.PlayerState.PAUSED || e?.data === YT.PlayerState.BUFFERING) {
+                const inCooldown = Date.now() - resumeAtRef.current < RESUME_COOLDOWN_MS
+                if (inCooldown) return
                 setIsPlaying(false)
                 setIsPausedCover(true)
               }
@@ -171,9 +176,20 @@ export function ZenPlayer({ videoId, startSeconds = 0, onProgressSeconds }: Prop
     }
   }, [isPlaying, onProgressSeconds, ready])
 
+  const handleResume = (e?: React.SyntheticEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+    resumeAtRef.current = Date.now()
+    try {
+      playerRef.current?.playVideo?.()
+    } catch {
+      // ignore
+    }
+  }
+
   return (
     <section className="playerShell">
-      <div className="playerFrame">
+      <div className={`playerFrame ${isPausedCover ? 'playerFrame--overlayActive' : ''}`}>
         <div className="player" id={containerId} />
 
         <div className={`fadeOverlay ${ended ? 'fadeOverlay--on' : ''}`} aria-hidden="true" />
@@ -182,18 +198,21 @@ export function ZenPlayer({ videoId, startSeconds = 0, onProgressSeconds }: Prop
           <button
             type="button"
             className="pauseCover"
-            onClick={() => {
-              try {
-                playerRef.current?.playVideo?.()
-              } catch {
-                // ignore
+            onPointerDown={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleResume(e)
+            }}
+            onClick={(e) => e.preventDefault()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                handleResume(e)
               }
             }}
+            aria-label="Resume playback"
           >
-            <span className="pauseCoverInner">
-              <span className="pauseCoverTitle">Paused</span>
-              <span className="pauseCoverBody">Click to resume</span>
-            </span>
+            <span className="pauseCoverBtn" aria-hidden="true">▶</span>
           </button>
         )}
 

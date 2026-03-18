@@ -1,5 +1,6 @@
 webApp/node_modules/
 webApp/dist/
+webApp/public/*.xpi
 webApp/*.tsbuildinfo
 .vite/
 .DS_Store

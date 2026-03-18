@@ -248,14 +248,21 @@ export function App() {
         ) : null}
       </main>
 
-      {activeVideoId ? (
-        <footer className="footer">
-          <span>
+      <footer className="footer">
+        {activeVideoId && (
+          <span className="footerEmbed">
             Uses YouTube’s embedded player. Suggestions are covered with a fade
             overlay when playback ends.
           </span>
-        </footer>
-      ) : null}
+        )}
+        <a
+          href={`${import.meta.env.BASE_URL}youtubezen-extension.xpi`}
+          className="footerExtensionBtn"
+          download="youtubezen-extension.xpi"
+        >
+          Install Firefox extension
+        </a>
+      </footer>
     </div>
   )
 }
