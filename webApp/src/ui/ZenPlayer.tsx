@@ -102,11 +102,14 @@ export function ZenPlayer({ videoId, startSeconds = 0, onProgressSeconds }: Prop
                 setEnded(false)
                 setIsPlaying(true)
                 setIsPausedCover(false)
-              } else if (e?.data === YT.PlayerState.PAUSED || e?.data === YT.PlayerState.BUFFERING) {
+              } else if (e?.data === YT.PlayerState.PAUSED) {
                 const inCooldown = Date.now() - resumeAtRef.current < RESUME_COOLDOWN_MS
                 if (inCooldown) return
                 setIsPlaying(false)
                 setIsPausedCover(true)
+              } else if (e?.data === YT.PlayerState.BUFFERING) {
+                setIsPlaying(false)
+                setIsPausedCover(false)
               }
             },
           },
@@ -132,25 +135,18 @@ export function ZenPlayer({ videoId, startSeconds = 0, onProgressSeconds }: Prop
   useEffect(() => {
     if (!ready) return
 
-    const pause = () => {
-      try {
-        playerRef.current?.pauseVideo?.()
-      } catch {
-        // ignore
+    const onVisibility = () => {
+      if (document.hidden) {
+        try {
+          playerRef.current?.pauseVideo?.()
+        } catch {
+          // ignore
+        }
       }
     }
 
-    const onVisibility = () => {
-      if (document.hidden) pause()
-    }
-
     document.addEventListener('visibilitychange', onVisibility)
-    window.addEventListener('blur', pause)
-
-    return () => {
-      document.removeEventListener('visibilitychange', onVisibility)
-      window.removeEventListener('blur', pause)
-    }
+    return () => document.removeEventListener('visibilitychange', onVisibility)
   }, [ready])
 
   useEffect(() => {
