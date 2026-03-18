@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { extractYouTubeVideoId } from '../utils/extractYouTubeVideoId'
 import { fetchYouTubeTitle } from '../utils/fetchYouTubeTitle'
 import { useLocalStorageState } from '../utils/useLocalStorageState'
@@ -32,6 +32,20 @@ export function App() {
   )
 
   const isMinimized = Boolean(activeVideoId) && !isAdding
+  const [extensionDropdownOpen, setExtensionDropdownOpen] = useState(false)
+  const [extensionCopied, setExtensionCopied] = useState(false)
+  const extensionDropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!extensionDropdownOpen) return
+    const onDocClick = (e: MouseEvent) => {
+      if (extensionDropdownRef.current && !extensionDropdownRef.current.contains(e.target as Node)) {
+        setExtensionDropdownOpen(false)
+      }
+    }
+    document.addEventListener('click', onDocClick)
+    return () => document.removeEventListener('click', onDocClick)
+  }, [extensionDropdownOpen])
 
   // Allow opening the site with a preloaded video:
   //   /?v=<videoId>
@@ -255,13 +269,50 @@ export function App() {
             overlay when playback ends.
           </span>
         )}
-        <a
-          href={`${import.meta.env.BASE_URL}youtubezen-extension.xpi`}
-          className="footerExtensionBtn"
-          download="youtubezen-extension.xpi"
-        >
-          Install Firefox extension
-        </a>
+        <div className="footerExtensionWrap" ref={extensionDropdownRef}>
+          <a
+            href={`${import.meta.env.BASE_URL}youtubezen-extension.xpi`}
+            className="footerExtensionBtn"
+            download="youtubezen-extension.xpi"
+          >
+            Download Extension
+          </a>
+          <button
+            type="button"
+            className="footerExtensionDropdownTrigger"
+            onClick={() => setExtensionDropdownOpen((o) => !o)}
+            aria-expanded={extensionDropdownOpen}
+            aria-haspopup="true"
+            title="More options"
+          >
+            ▾
+          </button>
+          {extensionDropdownOpen && (
+            <div className="footerExtensionDropdown">
+              <button
+                type="button"
+                className="footerExtensionDropdownItem"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText('about:debugging#/runtime/this-firefox')
+                    setExtensionCopied(true)
+                    setTimeout(() => {
+                      setExtensionCopied(false)
+                      setExtensionDropdownOpen(false)
+                    }, 1200)
+                  } catch {
+                    // ignore
+                  }
+                }}
+              >
+                {extensionCopied ? 'Copied!' : 'Copy Firefox Config Url'}
+              </button>
+              <p className="footerExtensionDropdownHint">
+                Paste into a new tab to load the extension in Firefox.
+              </p>
+            </div>
+          )}
+        </div>
       </footer>
     </div>
   )

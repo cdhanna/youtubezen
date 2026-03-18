@@ -425,26 +425,82 @@ code {
   font-size: 12px;
 }
 
+.footerExtensionWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
 .footerExtensionBtn {
   padding: 10px 14px;
-  border-radius: 14px;
-  border: 2px solid rgba(10, 10, 18, 0.88);
-  background: linear-gradient(135deg, rgba(255, 74, 0, 0.95), rgba(255, 138, 0, 0.95));
-  color: rgba(10, 10, 18, 0.95);
-  font-weight: 700;
+  border-radius: 14px 0 0 14px;
+  border: 1px solid rgba(10, 10, 18, 0.35);
+  border-right: 0;
+  background: rgba(10, 10, 18, 0.08);
+  color: rgba(10, 10, 18, 0.75);
+  font-weight: 600;
   font-size: 13px;
   text-decoration: none;
   cursor: pointer;
-  transition: transform 120ms ease, filter 120ms ease;
+  transition: background 120ms ease;
 }
 
 .footerExtensionBtn:hover {
-  filter: brightness(1.03);
-  transform: translateY(-1px);
+  background: rgba(10, 10, 18, 0.12);
 }
 
-.footerExtensionBtn:active {
-  transform: translateY(0);
+.footerExtensionDropdownTrigger {
+  padding: 10px 8px;
+  border-radius: 0 14px 14px 0;
+  border: 1px solid rgba(10, 10, 18, 0.35);
+  background: rgba(10, 10, 18, 0.08);
+  color: rgba(10, 10, 18, 0.75);
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.footerExtensionDropdownTrigger:hover {
+  background: rgba(10, 10, 18, 0.12);
+}
+
+.footerExtensionDropdown {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 6px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(10, 10, 18, 0.35);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  min-width: 200px;
+}
+
+.footerExtensionDropdownItem {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(10, 10, 18, 0.9);
+  font: 600 13px/1.2 inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.footerExtensionDropdownItem:hover {
+  background: rgba(10, 10, 18, 0.08);
+}
+
+.footerExtensionDropdownHint {
+  margin: 8px 10px 0;
+  color: rgba(10, 10, 18, 0.55);
+  font-size: 11px;
+  line-height: 1.3;
 }
 
 @media (max-width: 560px) {
