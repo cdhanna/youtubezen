@@ -27,7 +27,10 @@ async function getZenUrl() {
 }
 
 function ensureButton() {
-  if (document.querySelector('.ytzen-btn')) return
+  if (document.querySelector('.ytzen-wrapper')) return
+
+  const wrapper = document.createElement('div')
+  wrapper.className = 'ytzen-wrapper'
 
   const btn = document.createElement('button')
   btn.className = 'ytzen-btn'
@@ -39,7 +42,9 @@ function ensureButton() {
     btn.disabled = !id
   }
 
-  btn.addEventListener('click', async () => {
+  btn.addEventListener('click', async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
     const id = getVideoId()
     if (!id) return
     const zen = await getZenUrl()
@@ -47,7 +52,8 @@ function ensureButton() {
     tabsApi.create({ url: target })
   })
 
-  document.documentElement.appendChild(btn)
+  wrapper.appendChild(btn)
+  document.body.appendChild(wrapper)
   updateEnabled()
 
   // YouTube is a SPA; watch URL changes.

@@ -1,8 +1,18 @@
+.ytzen-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+}
+
 .ytzen-btn {
   position: fixed;
+  top: 14px;
   right: 14px;
-  bottom: 14px;
-  z-index: 2147483647;
+  pointer-events: auto;
   border: 2px solid rgba(10, 10, 18, 0.92);
   border-radius: 16px;
   padding: 10px 12px;

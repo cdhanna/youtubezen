@@ -9,7 +9,8 @@ const outDir = path.join(root, 'webApp', 'public')
 const outFile = path.join(outDir, 'youtubezen-extension.xpi')
 
 fs.mkdirSync(outDir, { recursive: true })
-execSync(`cd "${extDir}" && zip -r "${outFile}" .`, { stdio: 'inherit' })
+// Use -X to exclude macOS resource forks; deflate compression for Firefox compatibility
+execSync(`cd "${extDir}" && zip -r -X "${outFile}" .`, { stdio: 'inherit' })
 if (!fs.existsSync(outFile)) {
   console.error('Extension build failed')
   process.exit(1)

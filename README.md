@@ -34,11 +34,18 @@ After the first successful workflow run, your site will be available at:
 If your repo name is `youtubezen`, that will be:
 `https://<your-username>.github.io/youtubezen/`
 
-## Firefox extension (local dev)
+## Firefox extension
 
+**Option A — Temporary (recommended for testing):**
 1. Firefox → `about:debugging` → “This Firefox”
 2. “Load Temporary Add-on…”
 3. Select `extension/manifest.json`
+
+**Option B — Install from downloaded .xpi:**
+1. Download the extension from the site (click “Install Firefox extension”)
+2. In Firefox: `about:addons` → gear icon → “Install Add-on From File” → select the .xpi
+
+If you get “appears to be corrupt,” Firefox may be blocking unsigned extensions. In `about:config`, set `xpinstall.signatures.required` to `false` (Developer Edition/Nightly only; regular Firefox ignores this).
 
 In the extension’s options, set your Zen site URL (local or deployed).
 
