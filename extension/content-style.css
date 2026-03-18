@@ -10,7 +10,7 @@
 
 .ytzen-btn {
   position: fixed;
-  top: 14px;
+  bottom: 14px;
   right: 14px;
   pointer-events: auto;
   border: 2px solid rgba(10, 10, 18, 0.92);
