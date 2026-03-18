@@ -1,5 +1,6 @@
-node_modules/
-dist/
-*.tsbuildinfo
+webApp/node_modules/
+webApp/dist/
+webApp/*.tsbuildinfo
+.vite/
 .DS_Store
 

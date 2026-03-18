@@ -33,6 +33,40 @@ export function App() {
 
   const isMinimized = Boolean(activeVideoId) && !isAdding
 
+  // Allow opening the site with a preloaded video:
+  //   /?v=<videoId>
+  // Optional:
+  //   /?v=<videoId>&t=<seconds>
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const v = params.get('v') ?? ''
+    const id = extractYouTubeVideoId(v)
+    if (!id) return
+
+    const tRaw = params.get('t')
+    const t = tRaw ? Number.parseInt(tRaw, 10) : 0
+    const start = Number.isFinite(t) && t > 0 ? t : 0
+
+    setCards((prev) => {
+      const existing = prev.find((p) => p.videoId === id)
+      if (existing) {
+        return prev.map((p) =>
+          p.videoId === id ? { ...p, lastSeconds: Math.max(p.lastSeconds, start) } : p,
+        )
+      }
+      return [
+        { videoId: id, url: `https://www.youtube.com/watch?v=${id}`, title: '', addedAt: Date.now(), lastSeconds: start },
+        ...prev,
+      ]
+    })
+
+    setActiveVideoId(id)
+    setIsAdding(false)
+    // Clean up URL so refresh doesn't re-add.
+    window.history.replaceState({}, document.title, window.location.pathname)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     let cancelled = false
 

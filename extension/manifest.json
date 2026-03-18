@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Zen Launcher",
+  "version": "0.1.0",
+  "description": "Adds a button on YouTube watch pages to open the video in YouTube Zen.",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": ["*://*.youtube.com/*", "*://m.youtube.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/watch*", "*://m.youtube.com/watch*"],
+      "js": ["content-script.js"],
+      "css": ["content-style.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  }
+}
+
